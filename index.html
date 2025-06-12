@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado del Arte en Aprendizaje Profundo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Calibri', 'Arial', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            overflow: hidden;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            background: #fff;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            padding: 60px 80px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Slide específicos */
+        .slide.title-slide {
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .slide.content-slide {
+            background: white;
+            color: #333;
+        }
+
+        .slide.section-slide {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* Tipografía */
+        .slide h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .slide h2 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 40px;
+            color: #1e3c72;
+            border-bottom: 3px solid #4facfe;
+            padding-bottom: 15px;
+        }
+
+        .slide.title-slide h2 {
+            color: white;
+            border-bottom: 3px solid rgba(255,255,255,0.5);
+        }
+
+        .slide.section-slide h2 {
+            color: white;
+            border-bottom: 3px solid rgba(255,255,255,0.5);
+            font-size: 3rem;
+        }
+
+        .slide h3 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #2a5298;
+        }
+
+        .slide p {
+            font-size: 1.3rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            text-align: justify;
+        }
+
+        .slide.title-slide p {
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        /* Listas */
+        .slide ul {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-left: 30px;
+            margin-bottom: 30px;
+        }
+
+        .slide li {
+            margin-bottom: 15px;
+            padding-left: 10px;
+        }
+
+        .slide li::marker {
+            color: #4facfe;
+            font-weight: bold;
+        }
+
+        /* Elementos destacados */
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .quote {
+            font-style: italic;
+            font-size: 1.4rem;
+            border-left: 4px solid #4facfe;
+            padding-left: 25px;
+            margin: 30px 0;
+            color: #2a5298;
+            background: #f0f8ff;
+            padding: 25px;
+            border-radius: 8px;
+        }
+
+        /* Navegación */
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: #4facfe;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            margin: 0 5px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+        }
+
+        .nav-btn:hover {
+            background: #2a5298;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+        }
+
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Indicador de diapositiva */
+        .slide-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 1rem;
+            z-index: 1000;
+        }
+
+        /* Grid para contenido en dos columnas */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: start;
+        }
+
+        /* Iconos visuales */
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #4facfe;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .slide {
+                padding: 40px 50px;
+            }
+            .slide h1 { font-size: 2.8rem; }
+            .slide h2 { font-size: 2rem; }
+            .slide h3 { font-size: 1.6rem; }
+            .slide p { font-size: 1.1rem; }
+            .two-column {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        
+        <!-- Diapositiva 1: Título -->
+        <div class="slide title-slide active">
+            <h1>Estado del Arte en Aprendizaje Profundo</h1>
+            <h2>Aprendizaje por Representación y Redes Transformer</h2>
+            <p>Una exploración de las tecnologías que están transformando la Inteligencia Artificial</p>
+            <br><br>
+            <p style="font-size: 1.2rem; opacity: 0.9;">Basado en "Deep Learning for AI" - Bengio, LeCun y Hinton (2023)</p>
+        </div>
+
+        <!-- Diapositiva 2: Agenda -->
+        <div class="slide content-slide">
+            <h2>Agenda de la Presentación</h2>
+            <div style="display: flex; justify-content: center; align-items: center; height: 70%;">
+                <ul style="font-size: 1.4rem; list-style: none; text-align: left;">
+                    <li style="background: #f0f8ff; padding: 20px; margin: 15px 0; border-radius: 10px; border-left: 5px solid #4facfe;">
+                        🎯 <strong>Introducción:</strong> Contexto y relevancia del aprendizaje profundo
+                    </li>
+                    <li style="background: #f0f8ff; padding: 20px; margin: 15px 0; border-radius: 10px; border-left: 5px solid #4facfe;">
+                        🧠 <strong>Aprendizaje por Representación:</strong> Fundamentos y aplicaciones
+                    </li>
+                    <li style="background: #f0f8ff; padding: 20px; margin: 15px 0; border-radius: 10px; border-left: 5px solid #4facfe;">
+                        ⚡ <strong>Redes Transformer:</strong> Revolución en procesamiento secuencial
+                    </li>
+                    <li style="background: #f0f8ff; padding: 20px; margin: 15px 0; border-radius: 10px; border-left: 5px solid #4facfe;">
+                        🔄 <strong>Sinergia:</strong> Integración de ambas tecnologías
+                    </li>
+                    <li style="background: #f0f8ff; padding: 20px; margin: 15px 0; border-radius: 10px; border-left: 5px solid #4facfe;">
+                        ⚠️ <strong>Desafíos:</strong> Retos actuales y futuros
+                    </li>
+                    <li style="background: #f0f8ff; padding: 20px; margin: 15px 0; border-radius: 10px; border-left: 5px solid #4facfe;">
+                        🚀 <strong>Conclusiones:</strong> Implicaciones y perspectivas futuras
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Diapositiva 3: Introducción - Sección -->
+        <div class="slide section-slide">
+            <div class="icon">🤖</div>
+            <h2>Introducción</h2>
+            <p style="font-size: 1.6rem;">El aprendizaje profundo como innovación trascendental</p>
+        </div>
+
+        <!-- Diapositiva 4: Introducción - Contenido -->
+        <div class="slide content-slide">
+            <h2>La Revolución del Aprendizaje Profundo</h2>
+            <div class="two-column">
+                <div>
+                    <h3>Transformación Radical</h3>
+                    <p>En la última década, el aprendizaje profundo ha transformado radicalmente la manera en que las máquinas aprenden, procesan y toman decisiones basadas en datos complejos.</p>
+                    
+                    <h3>Capacidades Cognitivas</h3>
+                    <p>Las computadoras ahora realizan tareas antes consideradas exclusivas de la cognición humana.</p>
+                </div>
+                <div>
+                    <h3>Aplicaciones Diversas</h3>
+                    <ul>
+                        <li>Visión por computadora</li>
+                        <li>Procesamiento del lenguaje natural</li>
+                        <li>Robótica avanzada</li>
+                        <li>Medicina e diagnóstico</li>
+                        <li>Automatización industrial</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="highlight-box">
+                <h3 style="color: white; margin-bottom: 15px;">Tecnologías Fundamentales</h3>
+                <p style="margin-bottom: 0;">Dos innovaciones impulsan esta revolución: <strong>Aprendizaje por Representación</strong> y <strong>Redes Transformer</strong></p>
+            </div>
+        </div>
+
+        <!-- Diapositiva 5: Aprendizaje por Representación - Sección -->
+        <div class="slide section-slide">
+            <div class="icon">🧠</div>
+            <h2>Aprendizaje por Representación</h2>
+            <p style="font-size: 1.6rem;">Transformando datos crudos en conocimiento estructurado</p>
+        </div>
+
+        <!-- Diapositiva 6: Definición del Aprendizaje por Representación -->
+        <div class="slide content-slide">
+            <h2>¿Qué es el Aprendizaje por Representación?</h2>
+            
+            <div class="quote">
+                "Proceso mediante el cual las máquinas transforman datos crudos y muchas veces ruidosos en representaciones internas que capturan las características esenciales y relevantes para la tarea específica"
+            </div>
+            
+            <div class="two-column">
+                <div>
+                    <h3>Características Clave</h3>
+                    <ul>
+                        <li>Transformación de datos crudos</li>
+                        <li>Múltiples niveles jerárquicos</li>
+                        <li>Captura patrones subyacentes</li>
+                        <li>Factores latentes no evidentes</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Ejemplo: Reconocimiento de Imágenes</h3>
+                    <ul>
+                        <li><strong>Capas iniciales:</strong> Bordes y texturas básicas</li>
+                        <li><strong>Capas intermedias:</strong> Formas y patrones</li>
+                        <li><strong>Capas superiores:</strong> Objetos completos y contextos</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diapositiva 7: Importancia del Enfoque Jerárquico -->
+        <div class="slide content-slide">
+            <h2>Enfoque Jerárquico: Clave del Éxito</h2>
+            
+            <h3>Complejidad de los Datos Reales</h3>
+            <p>Los datos del mundo real son enormemente complejos y multidimensionales. Las variables están interrelacionadas de manera estructurada y semántica.</p>
+            
+            <div class="highlight-box">
+                <div class="quote" style="background: transparent; color: white; border: none; padding: 0;">
+                    <strong>Bengio et al. (2023):</strong> "Una representación bien aprendida reduce la dependencia de ingeniería manual de características y permite que el sistema adapte su comprensión conforme recibe más datos"
+                </div>
+            </div>
+            
+            <h3>Beneficios del Procesamiento Jerárquico</h3>
+            <ul>
+                <li><strong>Escalabilidad:</strong> Sistemas que se adaptan a diferentes contextos</li>
+                <li><strong>Flexibilidad:</strong> Operación eficiente en múltiples dominios</li>
+                <li><strong>Generalización robusta:</strong> Comprende patrones específicos y relaciones abstractas</li>
+                <li><strong>Automatización:</strong> Reduce necesidad de ingeniería manual</li>
+            </ul>
+        </div>
+
+        <!-- Diapositiva 8: Redes Transformer - Sección -->
+        <div class="slide section-slide">
+            <div class="icon">⚡</div>
+            <h2>Redes Transformer</h2>
+            <p style="font-size: 1.6rem;">Revolucionando el procesamiento de datos secuenciales</p>
+        </div>
+
+        <!-- Diapositiva 9: Revolución de los Transformers -->
+        <div class="slide content-slide">
+            <h2>La Revolución Transformer</h2>
+            
+            <div class="two-column">
+                <div>
+                    <h3>Limitaciones Anteriores</h3>
+                    <ul>
+                        <li>Redes recurrentes y convolucionales</li>
+                        <li>Dificultad para dependencias a largo plazo</li>
+                        <li>Limitaciones en paralelización</li>
+                        <li>Entrenamiento ineficiente</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Innovación Transformer</h3>
+                    <ul>
+                        <li><strong>Mecanismo de atención</strong></li>
+                        <li>Asignación de pesos diferenciados</li>
+                        <li>Relevancia independiente de posición</li>
+                        <li>Procesamiento paralelo eficiente</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="quote">
+                <strong>LeCun (2023):</strong> "El mecanismo de atención rompe las limitaciones de los modelos secuenciales tradicionales, facilitando un procesamiento paralelo y capturando relaciones contextuales de manera más eficiente"
+            </div>
+        </div>
+
+        <!-- Diapositiva 10: Atención Multi-Cabeza -->
+        <div class="slide content-slide">
+            <h2>Atención Multi-Cabeza: Característica Distintiva</h2>
+            
+            <div class="highlight-box">
+                <h3 style="color: white;">¿Qué es la Atención Multi-Cabeza?</h3>
+                <p>Permite que el modelo analice simultáneamente múltiples relaciones o aspectos del input, enriqueciendo la comprensión del contexto.</p>
+            </div>
+            
+            <div class="two-column">
+                <div>
+                    <h3>Aplicaciones Exitosas</h3>
+                    <ul>
+                        <li>Traducción automática</li>
+                        <li>Generación de texto coherente</li>
+                        <li>Sistemas de respuesta a preguntas</li>
+                        <li>Análisis semántico avanzado</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Ventajas Operacionales</h3>
+                    <ul>
+                        <li><strong>Paralelización:</strong> Reducción de tiempo de entrenamiento</li>
+                        <li><strong>Eficiencia:</strong> Menor uso de recursos computacionales</li>
+                        <li><strong>Escalabilidad:</strong> Modelos de gran escala (BERT, GPT)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="quote">
+                <strong>Hinton (2023):</strong> "Los Transformers han permitido escalar modelos a niveles que antes eran impracticables"
+            </div>
+        </div>
+
+        <!-- Diapositiva 11: Sinergia - Sección -->
+        <div class="slide section-slide">
+            <div class="icon">🔄</div>
+            <h2>Sinergia Poderosa</h2>
+            <p style="font-size: 1.6rem;">Integración del Aprendizaje por Representación y Transformers</p>
+        </div>
+
+        <!-- Diapositiva 12: Integración Sinérgica -->
+        <div class="slide content-slide">
+            <h2>La Sinergia que Transforma la IA</h2>
+            
+            <div class="highlight-box">
+                <h3 style="color: white;">Combinación Poderosa</h3>
+                <p>La integración amplía la capacidad de las máquinas para comprender, razonar e interactuar con el mundo real.</p>
+            </div>
+            
+            <div class="two-column">
+                <div>
+                    <h3>Aprendizaje por Representación</h3>
+                    <ul>
+                        <li>Captura características profundas</li>
+                        <li>Estructuras jerárquicas complejas</li>
+                        <li>Patrones subyacentes</li>
+                        <li>Abstracción de alto nivel</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Redes Transformer</h3>
+                    <ul>
+                        <li>Manejo flexible de secuencias</li>
+                        <li>Procesamiento eficiente de contextos</li>
+                        <li>Atención selectiva</li>
+                        <li>Paralelización avanzada</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <h3>Aplicaciones Revolucionarias</h3>
+            <ul>
+                <li><strong>Medicina:</strong> Diagnósticos asistidos por IA</li>
+                <li><strong>Asistencia Virtual:</strong> Comprensión contextual avanzada</li>
+                <li><strong>Transporte:</strong> Vehículos autónomos</li>
+                <li><strong>Investigación:</strong> Análisis de datos complejos</li>
+            </ul>
+        </div>
+
+        <!-- Diapositiva 13: Desafíos - Sección -->
+        <div class="slide section-slide">
+            <div class="icon">⚠️</div>
+            <h2>Desafíos Actuales</h2>
+            <p style="font-size: 1.6rem;">Retos que definen el futuro de la investigación</p>
+        </div>
+
+        <!-- Diapositiva 14: Desafíos Significativos -->
+        <div class="slide content-slide">
+            <h2>Desafíos que Permanecen Abiertos</h2>
+            
+            <div class="two-column">
+                <div>
+                    <h3>🔍 Interpretabilidad y Transparencia</h3>
+                    <p>Los modelos complejos carecen de transparencia, generando preocupaciones en ámbitos donde las decisiones deben ser explicables y confiables.</p>
+                    
+                    <h3>⚡ Consumo Energético</h3>
+                    <p>El elevado consumo energético y recursos computacionales representan un reto crítico para la sostenibilidad y democratización.</p>
+                </div>
+                <div>
+                    <h3>⚖️ Sesgos en los Datos</h3>
+                    <p>La presencia de sesgos puede conducir a resultados injustos, subrayando la necesidad de métodos que mitiguen estos efectos.</p>
+                    
+                    <h3>📊 Dependencia de Datos</h3>
+                    <p>La necesidad de grandes cantidades de datos etiquetados plantea el desarrollo de técnicas de aprendizaje auto-supervisado.</p>
+                </div>
+            </div>
+            
+            <div class="highlight-box">
+                <h3 style="color: white;">Implicaciones Futuras</h3>
+                <p>Estos desafíos marcan el camino para futuras investigaciones y definen las prioridades del campo.</p>
+            </div>
+        </div>
+
+        <!-- Diapositiva 15: Conclusiones - Sección -->
+        <div class="slide section-slide">
+            <div class="icon">🚀</div>
+            <h2>Conclusiones</h2>
+            <p style="font-size: 1.6rem;">Implicaciones y perspectivas futuras</p>
+        </div>
+
+        <!-- Diapositiva 16: Síntesis Final -->
+        <div class="slide content-slide">
+            <h2>Síntesis del Estado del Arte</h2>
+            
+            <div class="highlight-box">
+                <h3 style="color: white;">Definición Actual</h3>
+                <p>El estado del arte se encuentra definido por la evolución del aprendizaje por representación y las redes Transformer, ampliando extraordinariamente las capacidades de los sistemas de IA.</p>
+            </div>
+            
+            <div class="two-column">
+                <div>
+                    <h3>Logros Fundamentales</h3>
+                    <ul>
+                        <li>Aproximación a procesos cognitivos humanos</li>
+                        <li>Comprensión y razonamiento sofisticados</li>
+                        <li>Visión jerárquica de los datos</li>
+                        <li>Manejo eficiente de información secuencial</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Impacto Transformador</h3>
+                    <ul>
+                        <li><strong>Academia:</strong> Revolución en investigación</li>
+                        <li><strong>Industria:</strong> Nuevas aplicaciones</li>
+                        <li><strong>Sociedad:</strong> Transformación sectorial</li>
+                        <li><strong>Salud, educación, comunicación</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diapositiva 17: Perspectivas Futuras -->
+        <div class="slide content-slide">
+            <h2>Perspectivas Futuras</h2>
+            
+            <div class="quote">
+                "Comprender estas tendencias es fundamental para investigadores, desarrolladores y profesionales que buscan estar a la vanguardia de la inteligencia artificial"
+            </div>
+            
+            <h3>Direcciones de Investigación Críticas</h3>
+            <ul>
+                <li><strong>Interpretabilidad:</strong> Modelos explicables y transparentes</li>
+                <li><strong>Eficiencia energética:</strong> Sostenibilidad computacional</li>
+                <li><strong>Equidad:</strong> Eliminación de sesgos algorítmicos</li>
+                <li><strong>Aprendizaje autónomo:</strong> Reducción de dependencia de datos etiquetados</li>
+            </ul>
+            
+            <div class="highlight-box">
+                <h3 style="color: white;">Visión a Futuro</h3>
+                <p>Estas tecnologías representan la base para la próxima generación de sistemas inteligentes capaces de interactuar y comprender el mundo con mayor profundidad y precisión.</p>
+            </div>
+            
+            <p><strong>El futuro del deep learning depende del progreso en estas áreas críticas, prometiendo innovaciones revolucionarias en las próximas décadas.</strong></p>
+        </div>
+
+        <!-- Diapositiva 18: Gracias -->
+        <div class="slide title-slide">
+            <h1>¡Gracias por su Atención!</h1>
+            <h2>Preguntas y Discusión</h2>
+            <br><br>
+            <p style="font-size: 1.3rem; opacity: 0.9;">
+                "El futuro de la inteligencia artificial se construye hoy<br>
+                con aprendizaje por representación y redes Transformer"
+            </p>
+        </div>
+
+    </div>
+
+    <!-- Navegación -->
+    <div class="navigation">
+        <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+        <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+    </div>
+
+    <!-- Indicador de diapositiva -->
+    <div class="slide-indicator">
+        <span id="slideNumber">1</span> / <span id="totalSlides">18</span>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            
+            document.getElementById('slideNumber').textContent = currentSlide + 1;
+            
+            // Actualizar botones
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            if (direction === 1 && currentSlide < totalSlides - 1) {
+                showSlide(currentSlide + 1);
+            } else if (direction === -1 && currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
+        }
+
+        // Navegación con teclado
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (e.key === 'Home') {
+                showSlide(0);
+            } else if (e.key === 'End') {
+                showSlide(totalSlides - 1);
+            }
+        });
+
+        // Inicializar
+        showSlide(0);
+    </script>
+</body>
+</html>
